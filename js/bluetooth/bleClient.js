@@ -25,7 +25,7 @@ class BleClient {
   async connect() {
     if (!this.isSupported()) {
       throw new Error(
-        'Twoja przeglądarka nie obsługuje Web Bluetooth API. Włącz Bluetooth w Chrome/Edge/Samsung Internet na Androidzie lub komputerze.'
+        'Your browser does not support the Web Bluetooth API. Please enable Bluetooth in Chrome, Edge, or Samsung Internet on Android / desktop.'
       );
     }
 
@@ -40,7 +40,7 @@ class BleClient {
       });
     } catch (e) {
       if (e.name === 'NotFoundError') {
-        throw new Error('Anulowano wybór urządzenia Bluetooth.');
+        throw new Error('Bluetooth device selection was cancelled.');
       }
       throw e;
     }
@@ -50,7 +50,7 @@ class BleClient {
     });
 
     if (!this.device.gatt) {
-      throw new Error('Brak interfejsu GATT w urządzeniu.');
+      throw new Error('Device does not have a GATT interface.');
     }
 
     this.server = await this.device.gatt.connect();
@@ -116,14 +116,14 @@ class BleClient {
   }
 
   async sendCommand(cmd, waitForResponse = false, timeoutMs = 2000) {
-    if (!this.writeChar) throw new Error('Drukarka nie jest połączona.');
+    if (!this.writeChar) throw new Error('Printer is not connected.');
 
     if (waitForResponse) {
       this.notifyBuffer = [];
       return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
           this.notifyWaitResolver = null;
-          reject(new Error(`Timeout odpowiedzi (${timeoutMs}ms)`));
+          reject(new Error(`Response timeout (${timeoutMs}ms)`));
         }, timeoutMs);
 
         this.notifyWaitResolver = (response) => {
@@ -172,7 +172,7 @@ class BleClient {
         }
       } catch {}
     } catch (e) {
-      console.warn('Błąd odświeżania parametrów drukarki:', e);
+      console.warn('Error refreshing printer status:', e);
     }
   }
 
@@ -198,23 +198,23 @@ class BleClient {
   }
 
   async executePrint(rasterPayload, onProgress) {
-    if (!this.writeChar) throw new Error('Drukarka nie jest połączona!');
+    if (!this.writeChar) throw new Error('Printer is not connected!');
 
     this.abortController = new AbortController();
     const signal = this.abortController.signal;
 
     // Check printer hardware state
     await this.refreshStatus();
-    if (store.get('isCoverOpen')) throw new Error('Pokrywa drukarki jest otwarta!');
-    if (store.get('isNoPaper')) throw new Error('W drukarce brakuje papieru!');
-    if (store.get('isOverheated')) throw new Error('Głowica drukarki jest przegrzana! Odczekaj chwilę.');
+    if (store.get('isCoverOpen')) throw new Error('Printer cover is open!');
+    if (store.get('isNoPaper')) throw new Error('Printer is out of paper!');
+    if (store.get('isOverheated')) throw new Error('Printhead is overheated! Please wait a moment.');
 
     const delay = (ms) =>
       new Promise((resolve, reject) => {
         const t = setTimeout(resolve, ms);
         signal.addEventListener('abort', () => {
           clearTimeout(t);
-          reject(new Error('Wydruk został anulowany przez użytkownika.'));
+          reject(new Error('Print job was cancelled by user.'));
         });
       });
 
@@ -233,7 +233,7 @@ class BleClient {
       currentBytes: 0,
       totalBytes: total,
       percent: 0,
-      statusText: 'Inicjalizacja drukarki i ustawianie gęstości...',
+      statusText: 'Initializing printer and applying density settings...',
     });
 
     for (let copy = 1; copy <= pacing.copies; copy++) {
@@ -258,7 +258,7 @@ class BleClient {
       const chunkSize = pacing.chunkSize;
 
       for (let offset = 0; offset < total; offset += chunkSize) {
-        if (signal.aborted) throw new Error('Wydruk został anulowany.');
+        if (signal.aborted) throw new Error('Print job cancelled.');
 
         const chunk = rasterPayload.subarray(offset, Math.min(offset + chunkSize, total));
         await this.writeChar.writeValueWithoutResponse(chunk);
@@ -273,7 +273,7 @@ class BleClient {
           currentBytes: current,
           totalBytes: total,
           percent: Math.round((current / total) * 100),
-          statusText: `Wysyłanie danych [Kopia ${copy}/${pacing.copies}] (${Math.round(
+          statusText: `Transmitting data [Copy ${copy}/${pacing.copies}] (${Math.round(
             current / 1024
           )} / ${Math.round(total / 1024)} KB)...`,
           remSec,
@@ -290,7 +290,7 @@ class BleClient {
         currentBytes: total,
         totalBytes: total,
         percent: 99,
-        statusText: 'Oczekiwanie na zakończenie grzania głowicy...',
+        statusText: 'Waiting for printhead to finish thermal heating...',
         remSec: 2,
       });
       await delay(500);
@@ -299,7 +299,7 @@ class BleClient {
       try {
         await this.sendCommand(CMD.stopPrint, true, 20000);
       } catch (e) {
-        console.warn('Brak potwierdzenia 0xAA po stop_print:', e);
+        console.warn('No 0xAA acknowledgment received after stop_print:', e);
       }
     }
 
@@ -308,7 +308,7 @@ class BleClient {
       currentBytes: total,
       totalBytes: total,
       percent: 100,
-      statusText: 'Wydruk zakończony pomyślnie!',
+      statusText: 'Print completed successfully!',
     });
   }
 

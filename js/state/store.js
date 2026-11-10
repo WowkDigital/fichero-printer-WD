@@ -2,12 +2,12 @@
 
 export const PaperPresets = {
   A4_STD: { name: 'A4 Standard (204 mm)', widthMm: 204, dots: 1632, fullPageH: 297 },
-  A4_FULL: { name: 'A4 Pełna głowica (210 mm)', widthMm: 210, dots: 1680, fullPageH: 297 },
+  A4_FULL: { name: 'A4 Full Printhead (210 mm)', widthMm: 210, dots: 1680, fullPageH: 297 },
   LETTER: { name: 'US Letter (216 mm)', widthMm: 216, dots: 1728, fullPageH: 279 },
-  A5: { name: 'A5 Rolka (148 mm)', widthMm: 148, dots: 1184, fullPageH: 210 },
-  ROLL_105: { name: 'Rolka 105 mm (Etykiety)', widthMm: 105, dots: 840, fullPageH: 150 },
-  ROLL_80: { name: 'Rolka 80 mm (Paragon)', widthMm: 80, dots: 640, fullPageH: 120 },
-  ROLL_58: { name: 'Rolka 58 mm (Wąska)', widthMm: 58, dots: 464, fullPageH: 100 },
+  A5: { name: 'A5 Roll (148 mm)', widthMm: 148, dots: 1184, fullPageH: 210 },
+  ROLL_105: { name: '105 mm Roll (Labels)', widthMm: 105, dots: 840, fullPageH: 150 },
+  ROLL_80: { name: '80 mm Roll (Receipt)', widthMm: 80, dots: 640, fullPageH: 120 },
+  ROLL_58: { name: '58 mm Roll (Narrow)', widthMm: 58, dots: 464, fullPageH: 100 },
 };
 
 class Store {

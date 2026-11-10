@@ -149,7 +149,7 @@ export async function renderQrCode(canvas, text, size = 500) {
       ctx.fillStyle = '#000000';
       ctx.font = 'bold 20px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('Kod QR dla:', size / 2, size / 2 - 20);
+      ctx.fillText('QR Code for:', size / 2, size / 2 - 20);
       ctx.fillText(text.slice(0, 25), size / 2, size / 2 + 20);
       resolve();
     };

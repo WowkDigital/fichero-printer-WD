@@ -59,7 +59,7 @@ function loadDefaultContent() {
 function updatePayloadSize() {
   const payload = viewport.getPrintPayload();
   if (payload) {
-    printPayloadSize.textContent = `Rozmiar: ${Math.round(payload.fullJob.length / 1024)} KB (${payload.totalFeedMm} mm wysuwu)`;
+    printPayloadSize.textContent = `Size: ${Math.round(payload.fullJob.length / 1024)} KB (${payload.totalFeedMm} mm feed)`;
   }
 }
 
@@ -71,12 +71,12 @@ btnConnect.addEventListener('click', async () => {
   }
 
   btnConnect.disabled = true;
-  btnConnect.innerHTML = '<span>⏳ Łączenie z BLE...</span>';
+  btnConnect.innerHTML = '<span>⏳ Connecting to BLE...</span>';
 
   try {
     await bleClient.connect();
   } catch (err) {
-    alert(err.message || 'Nie udało się połączyć z urządzeniem Bluetooth.');
+    alert(err.message || 'Could not connect to Bluetooth device.');
   } finally {
     btnConnect.disabled = false;
   }
@@ -86,14 +86,14 @@ btnConnect.addEventListener('click', async () => {
 store.subscribe('connected', (connected) => {
   if (connected) {
     statusDot.classList.add('connected');
-    statusText.textContent = store.get('deviceName') || 'Połączono';
+    statusText.textContent = store.get('deviceName') || 'Connected';
     btnConnect.className = 'btn btn-secondary';
-    btnConnect.innerHTML = '<span>🔌 Rozłącz</span>';
+    btnConnect.innerHTML = '<span>🔌 Disconnect</span>';
   } else {
     statusDot.classList.remove('connected');
-    statusText.textContent = 'Rozłączono';
+    statusText.textContent = 'Disconnected';
     btnConnect.className = 'btn btn-primary';
-    btnConnect.innerHTML = '<span>📡 Połącz z Drukarką (BT)</span>';
+    btnConnect.innerHTML = '<span>📡 Connect Printer (BT)</span>';
     batteryBadge.style.display = 'none';
   }
 });
@@ -195,7 +195,7 @@ pdfFileInput.addEventListener('change', async (e) => {
     pdfTotalPages.textContent = currentPdf.numPages;
     await renderPdfPage(currentPdfPage);
   } catch (err) {
-    alert('Błąd odczytu pliku PDF: ' + err.message);
+    alert('Error loading PDF document: ' + err.message);
   }
 });
 
@@ -492,21 +492,21 @@ btnPrint.addEventListener('click', async () => {
     try {
       await bleClient.connect();
     } catch {
-      alert('Aby drukować, najpierw połącz się z drukarką (przycisk u góry)!');
+      alert('To print, please connect to the printer first (button at the top)!');
       return;
     }
   }
 
   const payload = viewport.getPrintPayload();
   if (!payload || !payload.fullJob || payload.fullJob.length === 0) {
-    alert('Brak danych do wydruku!');
+    alert('No content to print!');
     return;
   }
 
   printModal.classList.add('open');
   printProgressBar.style.width = '0%';
   printProgressPercent.textContent = '0%';
-  printStatusText.textContent = 'Rozpoczynanie wydruku...';
+  printStatusText.textContent = 'Starting print job...';
 
   try {
     await bleClient.executePrint(payload.fullJob, (p) => {
@@ -524,7 +524,7 @@ btnPrint.addEventListener('click', async () => {
       printModal.classList.remove('open');
     }, 1500);
   } catch (err) {
-    printStatusText.textContent = 'Błąd: ' + (err.message || 'Wydruk przerwany');
+    printStatusText.textContent = 'Error: ' + (err.message || 'Print job aborted');
     setTimeout(() => {
       printModal.classList.remove('open');
     }, 3000);
@@ -544,7 +544,7 @@ btnOpenManual.addEventListener('click', () => {
 document.querySelectorAll('[data-feed]').forEach((btn) => {
   btn.addEventListener('click', async () => {
     if (!store.get('connected')) {
-      alert('Drukarka nie jest połączona!');
+      alert('Printer is not connected!');
       return;
     }
     const mm = parseInt(btn.dataset.feed, 10);
@@ -552,7 +552,7 @@ document.querySelectorAll('[data-feed]').forEach((btn) => {
     try {
       await bleClient.feedPaper(mm);
     } catch (e) {
-      alert('Błąd wysuwu: ' + e.message);
+      alert('Feed error: ' + e.message);
     } finally {
       btn.disabled = false;
     }
@@ -561,7 +561,7 @@ document.querySelectorAll('[data-feed]').forEach((btn) => {
 
 document.getElementById('btnDiagnosticStatus').addEventListener('click', async () => {
   await bleClient.refreshStatus();
-  alert(`Status: ${store.get('isPrinting') ? 'Drukuje' : 'Gotowa'}, Bateria: ${store.get('batteryPercent')}%`);
+  alert(`Status: ${store.get('isPrinting') ? 'Printing' : 'Ready'}, Battery: ${store.get('batteryPercent')}%`);
 });
 
 // Launch!

@@ -1,7 +1,7 @@
 {
   "name": "Fichero Studio PRO",
   "short_name": "Fichero PRO",
-  "description": "Zaawansowane Studio Druku Termicznego A4 dla Fichero 6181",
+  "description": "Advanced A4 Thermal Print Studio for Fichero 6181 & Compatible Printers",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#090d16",

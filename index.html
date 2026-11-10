@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Fichero Studio PRO - Drukarka Termiczna A4</title>
+    <title>Fichero Studio PRO - A4 Thermal Printer Studio</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 6 2 18 2 18 9'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><rect width='12' height='8' x='6' y='14'/></svg>" />
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#0f172a" />
@@ -29,7 +29,7 @@
           <div class="brand-title">
             Fichero Studio <span class="brand-badge">PRO</span>
           </div>
-          <div class="brand-sub">Fichero 6181 &bull; Drukarka Termiczna A4</div>
+          <div class="brand-sub">Fichero 6181 &bull; A4 Thermal Printer</div>
         </div>
       </div>
 
@@ -37,7 +37,7 @@
         <!-- Live Connection Status -->
         <div id="statusBadge" class="status-badge">
           <div id="statusDot" class="status-dot"></div>
-          <span id="statusText">Rozłączono</span>
+          <span id="statusText">Disconnected</span>
         </div>
 
         <!-- Battery Indicator -->
@@ -47,13 +47,13 @@
         </div>
 
         <!-- Manual Controls Button -->
-        <button id="btnOpenManual" class="btn btn-secondary" title="Wysuw papieru i testy sprzętowe">
-          <span>⚙️ Wysuw / Testy</span>
+        <button id="btnOpenManual" class="btn btn-secondary" title="Paper feed and hardware tests">
+          <span>⚙️ Feed / Tests</span>
         </button>
 
         <!-- Main Bluetooth Action Button -->
         <button id="btnConnect" class="btn btn-primary">
-          <span>📡 Połącz z Drukarką (BT)</span>
+          <span>📡 Connect Printer (BT)</span>
         </button>
       </div>
     </header>
@@ -64,12 +64,12 @@
       <section class="workspace-pane">
         <!-- Content Source Selector Tabs -->
         <nav class="tabs-bar">
-          <button class="tab-btn active" data-tab="image">🖼️ Zdjęcie / Obraz</button>
-          <button class="tab-btn" data-tab="pdf">📄 Dokument PDF</button>
-          <button class="tab-btn" data-tab="text">✍️ Tekst / Etykieta</button>
-          <button class="tab-btn" data-tab="barcode">🔲 Kod Kreskowy / QR</button>
-          <button class="tab-btn" data-tab="draw">✏️ Rysowanie / Podpis</button>
-          <button class="tab-btn" data-tab="test">🎯 Wzorce Testowe</button>
+          <button class="tab-btn active" data-tab="image">🖼️ Image / Photo</button>
+          <button class="tab-btn" data-tab="pdf">📄 PDF Document</button>
+          <button class="tab-btn" data-tab="text">✍️ Text / Label</button>
+          <button class="tab-btn" data-tab="barcode">🔲 Barcode / QR</button>
+          <button class="tab-btn" data-tab="draw">✏️ Draw / Signature</button>
+          <button class="tab-btn" data-tab="test">🎯 Test Patterns</button>
         </nav>
 
         <!-- Tab 1: Image / Photo -->
@@ -77,9 +77,9 @@
           <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
             <input type="file" id="imageFileInput" accept="image/*" style="display: none;" />
             <button class="btn btn-secondary" onclick="document.getElementById('imageFileInput').click()">
-              📁 Wybierz plik z dysku / aparatu
+              📁 Choose file / camera
             </button>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">lub wklej ze schowka (Ctrl+V)</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">or paste from clipboard (Ctrl+V)</span>
           </div>
         </div>
 
@@ -88,11 +88,11 @@
           <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
             <input type="file" id="pdfFileInput" accept="application/pdf" style="display: none;" />
             <button class="btn btn-secondary" onclick="document.getElementById('pdfFileInput').click()">
-              📁 Otwórz dokument PDF
+              📁 Open PDF document
             </button>
             <div id="pdfControls" style="display: none; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
               <button id="btnPdfPrev" class="btn btn-secondary" style="padding: 0.3rem 0.6rem;">&lt;</button>
-              <span>Strona <b id="pdfCurrentPage">1</b> z <b id="pdfTotalPages">1</b></span>
+              <span>Page <b id="pdfCurrentPage">1</b> of <b id="pdfTotalPages">1</b></span>
               <button id="btnPdfNext" class="btn btn-secondary" style="padding: 0.3rem 0.6rem;">&gt;</button>
             </div>
           </div>
@@ -101,19 +101,19 @@
         <!-- Tab 3: Text / Label -->
         <div id="tab-text" class="tab-content">
           <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <textarea id="textInput" rows="2" placeholder="Wpisz treść etykiety, notatki lub dokumentu..." style="resize: vertical;">FICHERO 6181
-Zaawansowany Druk Termiczny A4
-Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
+            <textarea id="textInput" rows="2" placeholder="Enter label text, notes, or document..." style="resize: vertical;">FICHERO 6181
+Advanced A4 Thermal Printing
+High precision direct web bluetooth control</textarea>
             <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; font-size: 0.8rem;">
-              <label>Rozmiar: <input type="number" id="textFontSize" value="32" min="14" max="120" style="width: 70px;" /></label>
-              <label><input type="checkbox" id="textBold" checked /> Pogrubienie</label>
-              <label><input type="checkbox" id="textBorder" /> Ramka ozdobna</label>
+              <label>Size: <input type="number" id="textFontSize" value="32" min="14" max="120" style="width: 70px;" /></label>
+              <label><input type="checkbox" id="textBold" checked /> Bold</label>
+              <label><input type="checkbox" id="textBorder" /> Border frame</label>
               <select id="textAlign" style="width: 120px;">
-                <option value="left">Do lewej</option>
-                <option value="center" selected>Wyśrodkuj</option>
-                <option value="right">Do prawej</option>
+                <option value="left">Align Left</option>
+                <option value="center" selected>Center</option>
+                <option value="right">Align Right</option>
               </select>
-              <button id="btnUpdateText" class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">Odśwież tekst</button>
+              <button id="btnUpdateText" class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">Update Text</button>
             </div>
           </div>
         </div>
@@ -122,30 +122,30 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
         <div id="tab-barcode" class="tab-content">
           <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
             <select id="barcodeType" style="width: 160px;">
-              <option value="qr">Kod QR (2D)</option>
-              <option value="code128">Kod Kreskowy Code128</option>
+              <option value="qr">QR Code (2D)</option>
+              <option value="code128">Barcode Code128</option>
             </select>
-            <input type="text" id="barcodeValue" value="https://github.com/WowkDigital/fichero-printer-WD" style="flex: 1; min-width: 200px;" placeholder="Wpisz link lub dane..." />
-            <button id="btnGenerateBarcode" class="btn btn-secondary">Generuj Kod</button>
+            <input type="text" id="barcodeValue" value="https://github.com/WowkDigital/fichero-printer-WD" style="flex: 1; min-width: 200px;" placeholder="Enter link or data..." />
+            <button id="btnGenerateBarcode" class="btn btn-secondary">Generate Code</button>
           </div>
         </div>
 
         <!-- Tab 5: Drawing / Signature -->
         <div id="tab-draw" class="tab-content">
           <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Rysuj palcem lub myszką na podglądzie poniżej:</span>
-            <label style="font-size: 0.8rem;">Grubość: <input type="range" id="drawLineWidth" min="2" max="24" value="6" style="width: 100px; vertical-align: middle;" /></label>
-            <button id="btnClearDrawing" class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">Wyczyść szkic</button>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Draw with touch or mouse on the canvas below:</span>
+            <label style="font-size: 0.8rem;">Thickness: <input type="range" id="drawLineWidth" min="2" max="24" value="6" style="width: 100px; vertical-align: middle;" /></label>
+            <button id="btnClearDrawing" class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">Clear Canvas</button>
           </div>
         </div>
 
         <!-- Tab 6: Calibration Test Patterns -->
         <div id="tab-test" class="tab-content">
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button class="btn btn-secondary" data-test="band-1cm">⬛ Pasek 1.0 cm (Czarny)</button>
-            <button class="btn btn-secondary" data-test="ruler">📏 Linijka Milimetrowa (1:1)</button>
-            <button class="btn btn-secondary" data-test="gradient">🏁 Gradient Tonów</button>
-            <button class="btn btn-secondary" data-test="alignment-grid">📐 Siatka Kalibracyjna</button>
+            <button class="btn btn-secondary" data-test="band-1cm">⬛ 1.0 cm Solid Black Band</button>
+            <button class="btn btn-secondary" data-test="ruler">📏 Millimeter Ruler (1:1)</button>
+            <button class="btn btn-secondary" data-test="gradient">🏁 Tone Gradient Ramp</button>
+            <button class="btn btn-secondary" data-test="alignment-grid">📐 Alignment Grid</button>
           </div>
         </div>
 
@@ -155,9 +155,9 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
           <div class="preview-toolbar">
             <div style="display: flex; gap: 0.5rem; align-items: center;">
               <div class="segmented-bar">
-                <button class="segmented-btn active" data-prev="dither">Termik (1-bit)</button>
-                <button class="segmented-btn" data-prev="original">Oryginał</button>
-                <button class="segmented-btn" data-prev="split">Podzielony</button>
+                <button class="segmented-btn active" data-prev="dither">Thermal (1-bit)</button>
+                <button class="segmented-btn" data-prev="original">Original</button>
+                <button class="segmented-btn" data-prev="split">Split View</button>
               </div>
             </div>
 
@@ -187,54 +187,54 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
         <div class="control-card" style="border-color: rgba(34, 197, 94, 0.4); background: linear-gradient(180deg, #18272f, #182235);">
           <div class="control-card-title">
             <span style="display: flex; align-items: center; gap: 0.4rem;">
-              <span style="font-size: 1.1rem;">🖨️</span> Drukuj na Fichero 6181
+              <span style="font-size: 1.1rem;">🖨️</span> Print to Fichero 6181
             </span>
           </div>
           <button id="btnPrint" class="btn btn-primary btn-lg btn-full">
-            <span>DRUKUJ TERAZ</span>
+            <span>PRINT NOW</span>
           </button>
           <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-            <span>Kopie: <input type="number" id="copiesInput" value="1" min="1" max="99" style="width: 50px; padding: 0.1rem 0.3rem;" /></span>
-            <span id="printPayloadSize">Rozmiar: -- KB</span>
+            <span>Copies: <input type="number" id="copiesInput" value="1" min="1" max="99" style="width: 50px; padding: 0.1rem 0.3rem;" /></span>
+            <span id="printPayloadSize">Size: -- KB</span>
           </div>
         </div>
 
         <!-- Card: Dithering & Effects -->
         <div class="control-card">
           <div class="control-card-title">
-            <span>🎨 Dithering i Efekty</span>
+            <span>🎨 Dithering & Effects</span>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Algorytm rastrowania:</label>
+            <label class="control-label">Raster Algorithm:</label>
             <select id="selectAlgorithm">
-              <optgroup label="Artystyczne & Fotografie">
-                <option value="atkinson" selected>Atkinson (Czyste kropki, MacPaint)</option>
-                <option value="floyd-steinberg">Floyd-Steinberg (Klasyczny)</option>
-                <option value="stucki">Stucki (Wysoka szczegółowość)</option>
-                <option value="burkes">Burkes (Łagodne przejścia)</option>
+              <optgroup label="Artistic & Photos">
+                <option value="atkinson" selected>Atkinson (Crisp dots, MacPaint)</option>
+                <option value="floyd-steinberg">Floyd-Steinberg (Classic error diffusion)</option>
+                <option value="stucki">Stucki (High detail 48-div)</option>
+                <option value="burkes">Burkes (Smooth transitions)</option>
                 <option value="sierra-3">Sierra 3-row</option>
               </optgroup>
-              <optgroup label="Geometryczne & Prasa">
-                <option value="bayer-8">Bayer 8x8 (Raster zorganizowany)</option>
-                <option value="bayer-4">Bayer 4x4 (Styl retro)</option>
-                <option value="halftone">Halftone Screen (Raster gazetowy)</option>
+              <optgroup label="Geometric & Newsprint">
+                <option value="bayer-8">Bayer 8x8 (Ordered grid)</option>
+                <option value="bayer-4">Bayer 4x4 (Retro style)</option>
+                <option value="halftone">Halftone Screen (Newsprint dots)</option>
               </optgroup>
-              <optgroup label="Dokumenty & Tekst">
-                <option value="otsu">Otsu (Automatyczny próg dokumentów)</option>
-                <option value="sobel">Sobel Edge (Szkic / Kontury)</option>
-                <option value="threshold">Prosty Próg (Suwak)</option>
+              <optgroup label="Documents & Text">
+                <option value="otsu">Otsu (Auto document threshold)</option>
+                <option value="sobel">Sobel Edge (Pencil outline sketch)</option>
+                <option value="threshold">Simple Threshold (Slider)</option>
               </optgroup>
             </select>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Jasność: <span class="val" id="valBrightness">0</span></label>
+            <label class="control-label">Brightness: <span class="val" id="valBrightness">0</span></label>
             <input type="range" id="rangeBrightness" min="-100" max="100" value="0" />
           </div>
 
           <div class="control-group">
-            <label class="control-label">Kontrast: <span class="val" id="valContrast">0</span></label>
+            <label class="control-label">Contrast: <span class="val" id="valContrast">0</span></label>
             <input type="range" id="rangeContrast" min="-100" max="100" value="0" />
           </div>
 
@@ -244,26 +244,26 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
           </div>
 
           <div class="control-group" id="groupThreshold" style="display: none;">
-            <label class="control-label">Próg czerni: <span class="val" id="valThreshold">128</span></label>
+            <label class="control-label">Black Threshold: <span class="val" id="valThreshold">128</span></label>
             <input type="range" id="rangeThreshold" min="1" max="254" value="128" />
           </div>
 
           <div class="control-group" id="groupHalftone" style="display: none;">
-            <label class="control-label">Wielkość punktu rastra: <span class="val" id="valHalftone">6</span>px</label>
+            <label class="control-label">Halftone Dot Size: <span class="val" id="valHalftone">6</span>px</label>
             <input type="range" id="rangeHalftone" min="3" max="16" value="6" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 0.6rem; padding-top: 0.3rem; border-top: 1px solid var(--border);">
             <label class="switch-label">
-              <span>Odwróć kolory (Negatyw)</span>
+              <span>Invert colors (Negative)</span>
               <input type="checkbox" id="switchInvert" class="switch-input" />
             </label>
             <label class="switch-label">
-              <span>Wyostrz krawędzie (Sharpen)</span>
+              <span>Sharpen edges (Sharpen)</span>
               <input type="checkbox" id="switchSharpen" class="switch-input" />
             </label>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 0.8rem;">Obróć obraz:</span>
+              <span style="font-size: 0.8rem;">Rotate image:</span>
               <button id="btnRotate" class="btn btn-secondary" style="padding: 0.25rem 0.6rem;">🔄 +90&deg;</button>
             </div>
           </div>
@@ -272,41 +272,41 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
         <!-- Card: Working Area & Media Dimensions -->
         <div class="control-card">
           <div class="control-card-title">
-            <span>📐 Pole Robocze i Papier</span>
+            <span>📐 Working Area & Paper</span>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Format / Szerokość rolki:</label>
+            <label class="control-label">Paper Width Preset:</label>
             <select id="selectPaperPreset">
               <option value="A4_STD" selected>A4 Standard (204 mm / 1632 px)</option>
-              <option value="A4_FULL">A4 Pełna głowica (210 mm / 1680 px)</option>
+              <option value="A4_FULL">A4 Full Printhead (210 mm / 1680 px)</option>
               <option value="LETTER">US Letter (216 mm / 1728 px)</option>
-              <option value="A5">A5 Rolka (148 mm / 1184 px)</option>
-              <option value="ROLL_105">Rolka 105 mm (Etykiety / 840 px)</option>
-              <option value="ROLL_80">Rolka 80 mm (Paragon / 640 px)</option>
-              <option value="ROLL_58">Rolka 58 mm (Wąska / 464 px)</option>
+              <option value="A5">A5 Roll (148 mm / 1184 px)</option>
+              <option value="ROLL_105">105 mm Roll (Labels / 840 px)</option>
+              <option value="ROLL_80">80 mm Roll (Receipt / 640 px)</option>
+              <option value="ROLL_58">58 mm Roll (Narrow / 464 px)</option>
             </select>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Tryb długości papieru:</label>
+            <label class="control-label">Paper Length Mode:</label>
             <div class="segmented-bar">
-              <button class="segmented-btn active" data-mode="continuous">Rolka Ciągła</button>
-              <button class="segmented-btn" data-mode="fixed">Strona A4 (297 mm)</button>
+              <button class="segmented-btn active" data-mode="continuous">Continuous Roll</button>
+              <button class="segmented-btn" data-mode="fixed">Fixed A4 Page (297 mm)</button>
             </div>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Wyrównanie w podajniku:</label>
+            <label class="control-label">Tray Feed Alignment:</label>
             <div class="segmented-bar">
-              <button class="segmented-btn" data-align="left">Do Lewej</button>
-              <button class="segmented-btn active" data-align="center">Środek</button>
-              <button class="segmented-btn" data-align="right">Do Prawej</button>
+              <button class="segmented-btn" data-align="left">Left</button>
+              <button class="segmented-btn active" data-align="center">Center</button>
+              <button class="segmented-btn" data-align="right">Right</button>
             </div>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Wysuw do noża (mm): <span class="val" id="valFeedAfter">20</span></label>
+            <label class="control-label">Cutter Feed Margin (mm): <span class="val" id="valFeedAfter">20</span></label>
             <input type="range" id="rangeFeedAfter" min="0" max="60" value="20" />
           </div>
         </div>
@@ -314,32 +314,32 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
         <!-- Card: BLE Pacing & Engine Speed -->
         <div class="control-card">
           <div class="control-card-title">
-            <span>⚡ Tempo Transmisji i Grzanie</span>
+            <span>⚡ Transmission Speed & Heat</span>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Gęstość grzania głowicy (Density):</label>
+            <label class="control-label">Printhead Heating Density:</label>
             <div class="segmented-bar">
-              <button class="segmented-btn" data-density="0">0 (Jasny)</button>
-              <button class="segmented-btn" data-density="1">1 (Średni)</button>
-              <button class="segmented-btn active" data-density="2">2 (Ciemny)</button>
+              <button class="segmented-btn" data-density="0">0 (Light)</button>
+              <button class="segmented-btn" data-density="1">1 (Medium)</button>
+              <button class="segmented-btn active" data-density="2">2 (Dark)</button>
             </div>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Wielkość pakietu BLE: <span class="val" id="valChunkSize">200 B</span></label>
+            <label class="control-label">BLE Packet Chunk Size: <span class="val" id="valChunkSize">200 B</span></label>
             <select id="selectChunkSize">
-              <option value="64">64 Bajty (Maks. kompatybilność)</option>
-              <option value="128">128 Bajtów</option>
-              <option value="200" selected>200 Bajtów (Domyślny BLE MTU)</option>
-              <option value="244">244 Bajty (Szybki)</option>
+              <option value="64">64 Bytes (Max compatibility)</option>
+              <option value="128">128 Bytes</option>
+              <option value="200" selected>200 Bytes (Default BLE MTU)</option>
+              <option value="244">244 Bytes (High speed)</option>
             </select>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Opóźnienie między pakietami (Pacing): <span class="val" id="valChunkDelay">20 ms</span></label>
+            <label class="control-label">Inter-packet Pacing Delay: <span class="val" id="valChunkDelay">20 ms</span></label>
             <input type="range" id="rangeChunkDelay" min="5" max="80" step="5" value="20" />
-            <span style="font-size: 0.7rem; color: var(--text-muted);">Zwiększ, jeśli telefon gubi pakiety lub przerywa transmisję.</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Increase if your phone drops packets or disconnects.</span>
           </div>
         </div>
       </aside>
@@ -349,15 +349,15 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
     <div id="printModal" class="modal-backdrop">
       <div class="modal-dialog">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 1.1rem; font-weight: 700;">Wysyłanie do Drukarki...</h3>
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Sending to Printer...</h3>
           <span id="printProgressPercent" style="font-weight: 700; color: var(--accent);">0%</span>
         </div>
         <div class="progress-bar-container">
           <div id="printProgressBar" class="progress-bar-fill"></div>
         </div>
-        <p id="printStatusText" style="font-size: 0.85rem; color: var(--text-muted);">Przygotowywanie rastra...</p>
+        <p id="printStatusText" style="font-size: 0.85rem; color: var(--text-muted);">Preparing raster data...</p>
         <div style="display: flex; justify-content: flex-end;">
-          <button id="btnCancelPrint" class="btn btn-danger">Anuluj wydruk</button>
+          <button id="btnCancelPrint" class="btn btn-danger">Cancel Print</button>
         </div>
       </div>
     </div>
@@ -366,21 +366,21 @@ Wysoka precyzja i bezpośrednie sterowanie z przeglądarki</textarea>
     <div id="manualModal" class="modal-backdrop">
       <div class="modal-dialog">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 1.1rem; font-weight: 700;">Sterowanie Ręczne Papierem</h3>
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Manual Paper & Diagnostics</h3>
           <button class="btn btn-secondary" onclick="document.getElementById('manualModal').classList.remove('open')">&times;</button>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-muted);">
-          Możesz precyzyjnie wysunąć papier z rolki bez drukowania lub puścić szybki test głowicy:
+          Feed paper precisely forward without printing or run diagnostic checks:
         </p>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-          <button class="btn btn-secondary" data-feed="10">Wysuń 1.0 cm</button>
-          <button class="btn btn-secondary" data-feed="20">Wysuń 2.0 cm</button>
-          <button class="btn btn-secondary" data-feed="50">Wysuń 5.0 cm</button>
-          <button class="btn btn-secondary" data-feed="100">Wysuń 10.0 cm</button>
+          <button class="btn btn-secondary" data-feed="10">Feed 1.0 cm</button>
+          <button class="btn btn-secondary" data-feed="20">Feed 2.0 cm</button>
+          <button class="btn btn-secondary" data-feed="50">Feed 5.0 cm</button>
+          <button class="btn btn-secondary" data-feed="100">Feed 10.0 cm</button>
         </div>
         <div style="border-top: 1px solid var(--border); padding-top: 1rem; display: flex; justify-content: space-between;">
-          <button id="btnDiagnosticStatus" class="btn btn-secondary">Odśwież status</button>
-          <button class="btn btn-primary" onclick="document.getElementById('manualModal').classList.remove('open')">Zamknij</button>
+          <button id="btnDiagnosticStatus" class="btn btn-secondary">Refresh Status</button>
+          <button class="btn btn-primary" onclick="document.getElementById('manualModal').classList.remove('open')">Close</button>
         </div>
       </div>
     </div>

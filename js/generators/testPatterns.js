@@ -19,7 +19,7 @@ export function drawTestPattern(canvas, pattern) {
 
       ctx.font = 'bold 24px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('FICHERO 6181  |  PRECYZYJNA KALIBRACJA 1.0 CM', width / 2, 35);
+      ctx.fillText('FICHERO 6181  |  1.0 CM PRECISION CALIBRATION', width / 2, 35);
 
       // Solid black band
       ctx.fillRect(16, top, width - 32, bandHeight);
@@ -27,13 +27,13 @@ export function drawTestPattern(canvas, pattern) {
       // White text inside the black band
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 22px monospace';
-      ctx.fillText('[ DOKŁADNIE 10.0 mm (1.00 cm) ZADRUKU NA CZARNO ]', width / 2, top + 48);
+      ctx.fillText('[ EXACTLY 10.0 mm (1.00 cm) SOLID BLACK BAND ]', width / 2, top + 48);
 
       // Bottom info
       ctx.fillStyle = '#000000';
       ctx.font = '18px monospace';
       ctx.fillText(
-        '<--- 1632 piksele (204 mm) roboczej szerokości głowicy termicznej --->',
+        '<--- 1632 pixels (204 mm) active thermal printhead width --->',
         width / 2,
         top + bandHeight + 40
       );
@@ -44,7 +44,7 @@ export function drawTestPattern(canvas, pattern) {
       // Millimeter ruler with 8 dots/mm ticks
       ctx.font = 'bold 22px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('LINIJKA KALIBRACYJNA TERMICZNA (SKALA 1:1, 203 DPI)', width / 2, 35);
+      ctx.fillText('THERMAL CALIBRATION RULER (1:1 SCALE, 203 DPI)', width / 2, 35);
 
       const rulerY = 70;
       const totalMm = Math.floor(width / 8);
@@ -79,7 +79,7 @@ export function drawTestPattern(canvas, pattern) {
     case 'gradient': {
       ctx.font = 'bold 22px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('TEST GRADIENTU I ODDANIA TONÓW DITHERINGU', width / 2, 35);
+      ctx.fillText('DITHERING TONE & DENSITY GRADIENT TEST', width / 2, 35);
 
       const gradY = 60;
       const gradH = 100;
@@ -107,7 +107,7 @@ export function drawTestPattern(canvas, pattern) {
     case 'alignment-grid': {
       ctx.font = 'bold 22px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('SIATKA KALIBRACYJNA MARGINESÓW I OSTROŚCI', width / 2, 35);
+      ctx.fillText('MARGIN & ALIGNMENT CROSS GRID TEST', width / 2, 35);
 
       const gridY = 60;
       const gridH = canvas.height - 90;
