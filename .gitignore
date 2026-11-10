@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vite/
+repo_ref/
+cups_ref/
+*.log
+.DS_Store
+Thumbs.db

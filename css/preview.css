@@ -1,0 +1,75 @@
+/* Thermal Canvas Viewport & Preview Styling */
+
+.preview-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  background: #060910;
+}
+
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+
+.preview-viewport {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(#1e293b 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Paper Sheet Effect */
+.paper-sheet {
+  background: #fdfdfd;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  transform-origin: top center;
+  transition: transform 0.15s ease-out;
+  border-bottom: 2px dashed #cbd5e1; /* roll tear effect */
+}
+
+#previewCanvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Zoom Levels */
+.zoom-fit #previewCanvas {
+  width: 100%;
+  max-width: 600px;
+}
+
+.zoom-50 .paper-sheet {
+  transform: scale(0.5);
+}
+
+.zoom-100 .paper-sheet {
+  transform: scale(1);
+}
+
+.zoom-150 .paper-sheet {
+  transform: scale(1.5);
+}
+
+.canvas-info-badge {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
