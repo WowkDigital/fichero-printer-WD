@@ -1,75 +1,215 @@
-/* Thermal Canvas Viewport & Preview Styling */
-
-.preview-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  position: relative;
-  background: #060910;
-}
+/* ==========================================================================
+   Fichero Studio — preview workspace (stage, paper, zoom)
+   ========================================================================== */
 
 .preview-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background: var(--bg-secondary);
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
-  font-size: 0.75rem;
+  min-height: 52px;
 }
 
-.preview-viewport {
+.draw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.draw-badge .ic {
+  width: 14px;
+  height: 14px;
+}
+
+.zoom-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.zoom-label {
+  min-width: 52px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.zoom-label:hover {
+  background: var(--surface-2);
+}
+
+.zoom-sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--border);
+}
+
+/* ---------- Stage ---------- */
+.stage {
+  position: relative;
   flex: 1;
+  min-height: 0;
+  display: flex;
   overflow: auto;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 2rem;
-  background: radial-gradient(#1e293b 1px, transparent 1px);
+  padding: 32px;
+  background-color: var(--stage-bg);
+  background-image: radial-gradient(var(--stage-dot) 1px, transparent 1px);
   background-size: 20px 20px;
+  touch-action: pan-x pan-y;
+  overscroll-behavior: contain;
 }
 
-/* Paper Sheet Effect */
-.paper-sheet {
-  background: #fdfdfd;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  display: flex;
-  justify-content: center;
-  transform-origin: top center;
-  transition: transform 0.15s ease-out;
-  border-bottom: 2px dashed #cbd5e1; /* roll tear effect */
+.paper {
+  position: relative;
+  flex: none;
+  margin: auto; /* centers when small, top/left-aligns when overflowing */
+  background: #fff;
+  box-shadow: var(--paper-shadow);
+  border-radius: 3px 3px 0 0;
+  transition: width 0.15s var(--ease);
 }
 
-#previewCanvas {
+.stage.fit .paper {
+  width: min(100%, 980px);
+}
+
+.paper canvas {
   display: block;
+  width: 100%;
+  height: auto;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  max-width: 100%;
-  height: auto;
 }
 
-/* Zoom Levels */
-.zoom-fit #previewCanvas {
-  width: 100%;
-  max-width: 600px;
+#drawCanvas {
+  cursor: crosshair;
+  touch-action: none;
+  image-rendering: auto;
 }
 
-.zoom-50 .paper-sheet {
-  transform: scale(0.5);
+/* Torn roll edge for continuous paper */
+.paper.roll {
+  border-radius: 3px 3px 0 0;
 }
 
-.zoom-100 .paper-sheet {
-  transform: scale(1);
+.paper.roll::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 7px;
+  background: #fff;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
 }
 
-.zoom-150 .paper-sheet {
-  transform: scale(1.5);
+.paper:not(.roll) {
+  border-radius: 3px;
 }
 
-.canvas-info-badge {
-  font-family: monospace;
-  font-size: 0.75rem;
-  color: var(--text-muted);
+/* ---------- Stage info chip ---------- */
+.stage-info {
+  position: absolute;
+  left: 12px;
+  bottom: calc(12px + var(--dock-h));
+  pointer-events: none;
+  transition: bottom 0.28s var(--ease);
+}
+
+.info-chip {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  box-shadow: var(--shadow-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Drag & drop overlay ---------- */
+.drop-overlay {
+  position: absolute;
+  inset: 10px;
+  z-index: 5;
+  display: none;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--stage-bg));
+  pointer-events: none;
+}
+
+.drop-overlay.show {
+  display: grid;
+  animation: fade-in 0.15s ease;
+}
+
+.drop-overlay-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-2);
+  font-size: 14px;
+  text-align: center;
+}
+
+.drop-overlay-inner .ic {
+  width: 40px;
+  height: 40px;
+  color: var(--accent);
+}
+
+.drop-overlay-inner strong {
+  color: var(--text);
+  font-size: 18px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 767px) {
+  .preview-toolbar {
+    padding: 6px 10px;
+    min-height: 48px;
+  }
+  .stage {
+    padding: 16px;
+  }
+  .stage.fit .paper {
+    width: 100%;
+  }
+  #btnZoomReal,
+  .zoom-sep {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .zoom-label {
+    min-width: 44px;
+  }
+  #btnZoomFit {
+    display: none;
+  }
 }

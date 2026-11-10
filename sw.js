@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fichero-studio-v1';
+const CACHE_NAME = 'fichero-studio-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './css/controls.css',
   './css/preview.css',
   './js/app.js',
+  './js/ui/ui.js',
   './js/state/store.js',
   './js/protocol/escpos.js',
   './js/bluetooth/bleClient.js',

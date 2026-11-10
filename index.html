@@ -2,393 +2,559 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Fichero Studio PRO - A4 Thermal Printer Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Fichero Studio – Thermal Print Studio</title>
+    <meta name="description" content="Print images, PDFs, labels and QR codes on the Fichero 6181 A4 thermal printer straight from your browser via Web Bluetooth." />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 6 2 18 2 18 9'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><rect width='12' height='8' x='6' y='14'/></svg>" />
     <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#0b0f17" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- CSS stylesheets -->
+    <!-- Apply saved / system theme before first paint (prevents flash) -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('fichero-theme');
+          if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/controls.css" />
     <link rel="stylesheet" href="css/preview.css" />
 
-    <!-- Standalone PDF.js, QRCode and Confetti libraries from CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+    <!-- PDF.js, QRCode and Confetti libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js" defer></script>
   </head>
   <body>
-    <!-- Top Application Bar -->
-    <header class="app-header">
-      <div class="brand">
-        <div class="brand-icon">F</div>
-        <div>
-          <div class="brand-title">
-            Fichero Studio <span class="brand-badge">PRO</span>
+    <!-- ================= ICON SPRITE ================= -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-printer" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></symbol>
+        <symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></symbol>
+        <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+        <symbol id="i-type" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></symbol>
+        <symbol id="i-qr" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol>
+        <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></symbol>
+        <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></symbol>
+        <symbol id="i-scroll" viewBox="0 0 24 24"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+        <symbol id="i-bluetooth" viewBox="0 0 24 24"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></symbol>
+        <symbol id="i-battery" viewBox="0 0 24 24"><rect width="16" height="10" x="2" y="7" rx="2"/><line x1="22" x2="22" y1="11" y2="13"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></symbol>
+        <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+        <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+        <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></symbol>
+        <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+        <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+        <symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+        <symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol>
+        <symbol id="i-feed" viewBox="0 0 24 24"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+        <symbol id="i-align-left" viewBox="0 0 24 24"><path d="M15 12H3"/><path d="M17 18H3"/><path d="M21 6H3"/></symbol>
+        <symbol id="i-align-center" viewBox="0 0 24 24"><path d="M17 12H7"/><path d="M19 18H5"/><path d="M21 6H3"/></symbol>
+        <symbol id="i-align-right" viewBox="0 0 24 24"><path d="M21 12H9"/><path d="M21 18H7"/><path d="M21 6H3"/></symbol>
+        <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></symbol>
+        <symbol id="i-gradient" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M11 3v18" stroke-dasharray="2 2"/><path d="M15 3v18" stroke-dasharray="1 3"/></symbol>
+        <symbol id="i-square" viewBox="0 0 24 24"><rect width="18" height="8" x="3" y="8" rx="1" fill="currentColor"/></symbol>
+      </defs>
+    </svg>
+
+    <div class="app" id="app">
+      <!-- ================= TOP BAR ================= -->
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark"><svg class="ic"><use href="#i-printer" /></svg></div>
+          <div class="brand-text">
+            <strong>Fichero Studio</strong>
+            <span>6181 · A4 thermal</span>
           </div>
-          <div class="brand-sub">Fichero 6181 &bull; A4 Thermal Printer</div>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <!-- Live Connection Status -->
-        <div id="statusBadge" class="status-badge">
-          <div id="statusDot" class="status-dot"></div>
-          <span id="statusText">Disconnected</span>
         </div>
 
-        <!-- Battery Indicator -->
-        <div id="batteryBadge" class="status-badge" style="display: none;">
-          <span>🔋</span>
-          <span id="batteryVal">--%</span>
+        <div class="topbar-actions">
+          <button id="btnTheme" class="icon-btn" type="button" aria-label="Toggle light / dark theme" title="Toggle theme">
+            <svg class="ic only-dark"><use href="#i-sun" /></svg>
+            <svg class="ic only-light"><use href="#i-moon" /></svg>
+          </button>
+          <button id="btnConnect" class="conn-btn" type="button" data-state="disconnected" aria-live="polite">
+            <span class="conn-dot" aria-hidden="true"></span>
+            <svg class="ic conn-bt" aria-hidden="true"><use href="#i-bluetooth" /></svg>
+            <span class="conn-label" id="connLabel">Connect printer</span>
+            <span class="conn-battery" id="connBattery" hidden>
+              <svg class="ic"><use href="#i-battery" /></svg><span id="connBatteryVal">--%</span>
+            </span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ================= WORKSPACE / PREVIEW ================= -->
+      <main class="workspace" id="workspace" aria-label="Print preview">
+        <div class="preview-toolbar">
+          <div class="seg seg-sm" id="previewModeSeg" role="radiogroup" aria-label="Preview mode">
+            <button type="button" class="seg-btn active" data-prev="dither" role="radio" aria-checked="true">Thermal</button>
+            <button type="button" class="seg-btn" data-prev="original" role="radio" aria-checked="false">Original</button>
+            <button type="button" class="seg-btn" data-prev="split" role="radio" aria-checked="false">Split</button>
+          </div>
+          <span class="draw-badge" id="drawBadge" hidden><svg class="ic"><use href="#i-pen" /></svg>Drawing mode</span>
+
+          <div class="zoom-ctrl" role="group" aria-label="Zoom">
+            <button type="button" class="icon-btn sm" id="btnZoomOut" aria-label="Zoom out"><svg class="ic"><use href="#i-minus" /></svg></button>
+            <button type="button" class="zoom-label" id="zoomLabel" title="Fit to width">Fit</button>
+            <button type="button" class="icon-btn sm" id="btnZoomIn" aria-label="Zoom in"><svg class="ic"><use href="#i-plus" /></svg></button>
+            <span class="zoom-sep" aria-hidden="true"></span>
+            <button type="button" class="icon-btn sm active" id="btnZoomFit" aria-label="Fit to width" title="Fit to width"><svg class="ic"><use href="#i-fit" /></svg></button>
+            <button type="button" class="chip-btn" id="btnZoomReal" title="Real physical size on screen (approx.)">1:1</button>
+          </div>
         </div>
 
-        <!-- Manual Controls Button -->
-        <button id="btnOpenManual" class="btn btn-secondary" title="Paper feed and hardware tests">
-          <span>⚙️ Feed / Tests</span>
-        </button>
+        <div class="stage fit" id="stage">
+          <div class="paper roll" id="paper">
+            <canvas id="previewCanvas" aria-label="Thermal print preview"></canvas>
+            <canvas id="drawCanvas" hidden aria-label="Drawing canvas"></canvas>
+          </div>
+        </div>
 
-        <!-- Main Bluetooth Action Button -->
-        <button id="btnConnect" class="btn btn-primary">
-          <span>📡 Connect Printer (BT)</span>
-        </button>
-      </div>
-    </header>
+        <div class="stage-info">
+          <span class="info-chip" id="canvasInfo">—</span>
+        </div>
 
-    <!-- Main Studio Workspace -->
-    <main class="studio-layout">
-      <!-- Left Column: Source Selection + Interactive Preview Canvas -->
-      <section class="workspace-pane">
-        <!-- Content Source Selector Tabs -->
-        <nav class="tabs-bar">
-          <button class="tab-btn active" data-tab="image">🖼️ Image / Photo</button>
-          <button class="tab-btn" data-tab="pdf">📄 PDF Document</button>
-          <button class="tab-btn" data-tab="text">✍️ Text / Label</button>
-          <button class="tab-btn" data-tab="barcode">🔲 Barcode / QR</button>
-          <button class="tab-btn" data-tab="draw">✏️ Draw / Signature</button>
-          <button class="tab-btn" data-tab="test">🎯 Test Patterns</button>
+        <div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+          <div class="drop-overlay-inner">
+            <svg class="ic"><use href="#i-upload" /></svg>
+            <strong>Drop to load</strong>
+            <span>Images (PNG, JPG, WebP…) or PDF documents</span>
+          </div>
+        </div>
+      </main>
+
+      <!-- ================= INSPECTOR (sidebar on desktop, bottom sheet on mobile) ================= -->
+      <aside class="inspector" id="inspector" data-open="false" aria-label="Settings">
+        <nav class="inspector-tabs" role="tablist" aria-label="Settings sections">
+          <button type="button" class="itab active" data-panel="content" role="tab" aria-selected="true" aria-controls="panel-content">
+            <svg class="ic"><use href="#i-layers" /></svg><span>Content</span>
+          </button>
+          <button type="button" class="itab" data-panel="adjust" role="tab" aria-selected="false" aria-controls="panel-adjust">
+            <svg class="ic"><use href="#i-sliders" /></svg><span>Adjust</span>
+          </button>
+          <button type="button" class="itab" data-panel="paper" role="tab" aria-selected="false" aria-controls="panel-paper">
+            <svg class="ic"><use href="#i-scroll" /></svg><span>Paper</span>
+          </button>
+          <button type="button" class="itab" data-panel="printer" role="tab" aria-selected="false" aria-controls="panel-printer">
+            <svg class="ic"><use href="#i-printer" /></svg><span>Printer</span><i class="itab-dot" id="printerTabDot" hidden></i>
+          </button>
         </nav>
 
-        <!-- Tab 1: Image / Photo -->
-        <div id="tab-image" class="tab-content active">
-          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-            <input type="file" id="imageFileInput" accept="image/*" style="display: none;" />
-            <button class="btn btn-secondary" onclick="document.getElementById('imageFileInput').click()">
-              📁 Choose file / camera
-            </button>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">or paste from clipboard (Ctrl+V)</span>
-          </div>
-        </div>
+        <div class="inspector-body" id="inspectorBody">
+          <button type="button" class="sheet-handle" id="sheetHandle" aria-label="Close panel"><span></span></button>
 
-        <!-- Tab 2: PDF Document -->
-        <div id="tab-pdf" class="tab-content">
-          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-            <input type="file" id="pdfFileInput" accept="application/pdf" style="display: none;" />
-            <button class="btn btn-secondary" onclick="document.getElementById('pdfFileInput').click()">
-              📁 Open PDF document
-            </button>
-            <div id="pdfControls" style="display: none; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
-              <button id="btnPdfPrev" class="btn btn-secondary" style="padding: 0.3rem 0.6rem;">&lt;</button>
-              <span>Page <b id="pdfCurrentPage">1</b> of <b id="pdfTotalPages">1</b></span>
-              <button id="btnPdfNext" class="btn btn-secondary" style="padding: 0.3rem 0.6rem;">&gt;</button>
+          <!-- ========== PANEL: CONTENT ========== -->
+          <section class="panel active" id="panel-content" role="tabpanel">
+            <div class="source-grid" role="radiogroup" aria-label="Content type">
+              <button type="button" class="source-tile active" data-source="image" role="radio" aria-checked="true">
+                <svg class="ic"><use href="#i-image" /></svg><span>Image</span>
+              </button>
+              <button type="button" class="source-tile" data-source="pdf" role="radio" aria-checked="false">
+                <svg class="ic"><use href="#i-file" /></svg><span>PDF</span>
+              </button>
+              <button type="button" class="source-tile" data-source="text" role="radio" aria-checked="false">
+                <svg class="ic"><use href="#i-type" /></svg><span>Text</span>
+              </button>
+              <button type="button" class="source-tile" data-source="barcode" role="radio" aria-checked="false">
+                <svg class="ic"><use href="#i-qr" /></svg><span>QR / Code</span>
+              </button>
+              <button type="button" class="source-tile" data-source="draw" role="radio" aria-checked="false">
+                <svg class="ic"><use href="#i-pen" /></svg><span>Draw</span>
+              </button>
+              <button type="button" class="source-tile" data-source="test" role="radio" aria-checked="false">
+                <svg class="ic"><use href="#i-target" /></svg><span>Test</span>
+              </button>
             </div>
-          </div>
-        </div>
 
-        <!-- Tab 3: Text / Label -->
-        <div id="tab-text" class="tab-content">
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <textarea id="textInput" rows="2" placeholder="Enter label text, notes, or document..." style="resize: vertical;">FICHERO 6181
-Advanced A4 Thermal Printing
-High precision direct web bluetooth control</textarea>
-            <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; font-size: 0.8rem;">
-              <label>Size: <input type="number" id="textFontSize" value="32" min="14" max="120" style="width: 70px;" /></label>
-              <label><input type="checkbox" id="textBold" checked /> Bold</label>
-              <label><input type="checkbox" id="textBorder" /> Border frame</label>
-              <select id="textAlign" style="width: 120px;">
-                <option value="left">Align Left</option>
-                <option value="center" selected>Center</option>
-                <option value="right">Align Right</option>
-              </select>
-              <button id="btnUpdateText" class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">Update Text</button>
+            <!-- Image -->
+            <div class="source-pane active" id="src-image">
+              <button type="button" class="dropzone" id="btnPickImage">
+                <svg class="ic"><use href="#i-upload" /></svg>
+                <strong>Choose image or take photo</strong>
+                <span class="hide-touch">or drag &amp; drop · paste with Ctrl+V</span>
+                <span class="show-touch">JPG, PNG, WebP, HEIC…</span>
+              </button>
+              <div class="file-card" id="imageMeta" hidden>
+                <svg class="ic"><use href="#i-image" /></svg>
+                <div class="file-card-text"><strong id="imageName">image.jpg</strong><span id="imageDims">—</span></div>
+                <button type="button" class="btn btn-ghost btn-sm" id="btnReplaceImage">Replace</button>
+              </div>
+              <p class="hint"><svg class="ic"><use href="#i-info" /></svg>Tip: tune contrast and the dithering algorithm in <a href="#" data-goto="adjust">Adjust</a>.</p>
             </div>
-          </div>
-        </div>
 
-        <!-- Tab 4: Barcode / QR Code -->
-        <div id="tab-barcode" class="tab-content">
-          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-            <select id="barcodeType" style="width: 160px;">
-              <option value="qr">QR Code (2D)</option>
-              <option value="code128">Barcode Code128</option>
-            </select>
-            <input type="text" id="barcodeValue" value="https://github.com/WowkDigital/fichero-printer-WD" style="flex: 1; min-width: 200px;" placeholder="Enter link or data..." />
-            <button id="btnGenerateBarcode" class="btn btn-secondary">Generate Code</button>
-          </div>
-        </div>
-
-        <!-- Tab 5: Drawing / Signature -->
-        <div id="tab-draw" class="tab-content">
-          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Draw with touch or mouse on the canvas below:</span>
-            <label style="font-size: 0.8rem;">Thickness: <input type="range" id="drawLineWidth" min="2" max="24" value="6" style="width: 100px; vertical-align: middle;" /></label>
-            <button id="btnClearDrawing" class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">Clear Canvas</button>
-          </div>
-        </div>
-
-        <!-- Tab 6: Calibration Test Patterns -->
-        <div id="tab-test" class="tab-content">
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button class="btn btn-secondary" data-test="band-1cm">⬛ 1.0 cm Solid Black Band</button>
-            <button class="btn btn-secondary" data-test="ruler">📏 Millimeter Ruler (1:1)</button>
-            <button class="btn btn-secondary" data-test="gradient">🏁 Tone Gradient Ramp</button>
-            <button class="btn btn-secondary" data-test="alignment-grid">📐 Alignment Grid</button>
-          </div>
-        </div>
-
-        <!-- Preview Viewport Container -->
-        <div class="preview-container">
-          <!-- Viewport Toolbar -->
-          <div class="preview-toolbar">
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
-              <div class="segmented-bar">
-                <button class="segmented-btn active" data-prev="dither">Thermal (1-bit)</button>
-                <button class="segmented-btn" data-prev="original">Original</button>
-                <button class="segmented-btn" data-prev="split">Split View</button>
+            <!-- PDF -->
+            <div class="source-pane" id="src-pdf">
+              <button type="button" class="dropzone" id="btnPickPdf">
+                <svg class="ic"><use href="#i-file" /></svg>
+                <strong>Open PDF document</strong>
+                <span class="hide-touch">or drag &amp; drop a .pdf file here</span>
+                <span class="show-touch">Each page is printed at full paper width</span>
+              </button>
+              <div class="file-card" id="pdfMeta" hidden>
+                <svg class="ic"><use href="#i-file" /></svg>
+                <div class="file-card-text"><strong id="pdfName">document.pdf</strong><span id="pdfInfo">—</span></div>
+                <button type="button" class="btn btn-ghost btn-sm" id="btnReplacePdf">Replace</button>
+              </div>
+              <div class="pager" id="pdfPager" hidden>
+                <button type="button" class="icon-btn" id="btnPdfPrev" aria-label="Previous page"><svg class="ic"><use href="#i-chevron-left" /></svg></button>
+                <span>Page <b id="pdfCurrentPage">1</b> of <b id="pdfTotalPages">1</b></span>
+                <button type="button" class="icon-btn" id="btnPdfNext" aria-label="Next page"><svg class="ic"><use href="#i-chevron-right" /></svg></button>
               </div>
             </div>
 
-            <div class="canvas-info-badge" id="canvasInfo">
-              1632 &times; 800 px (204 &times; 100 mm)
+            <!-- Text -->
+            <div class="source-pane" id="src-text">
+              <div class="field">
+                <label class="field-label" for="textInput">Text</label>
+                <textarea id="textInput" rows="4" placeholder="Type label text, notes or a document…">FICHERO 6181
+Advanced A4 Thermal Printing
+High precision direct web bluetooth control</textarea>
+              </div>
+              <div class="field">
+                <div class="field-row"><label class="field-label" for="textFontSize">Font size</label><output class="val" id="valTextFontSize">32 px</output></div>
+                <input type="range" id="textFontSize" min="14" max="160" step="2" value="32" />
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                  <label class="field-label" for="textFont">Font</label>
+                  <select id="textFont">
+                    <option value="monospace">Monospace</option>
+                    <option value="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Sans-serif</option>
+                    <option value="Georgia, 'Times New Roman', serif">Serif</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <span class="field-label">Alignment</span>
+                  <div class="seg seg-icons" id="textAlignSeg" role="radiogroup" aria-label="Text alignment">
+                    <button type="button" class="seg-btn" data-text-align="left" aria-label="Align left"><svg class="ic"><use href="#i-align-left" /></svg></button>
+                    <button type="button" class="seg-btn active" data-text-align="center" aria-label="Align center"><svg class="ic"><use href="#i-align-center" /></svg></button>
+                    <button type="button" class="seg-btn" data-text-align="right" aria-label="Align right"><svg class="ic"><use href="#i-align-right" /></svg></button>
+                  </div>
+                </div>
+              </div>
+              <div class="toggle-list">
+                <label class="toggle"><span>Bold</span><input type="checkbox" id="textBold" checked /><i></i></label>
+                <label class="toggle"><span>Border frame</span><input type="checkbox" id="textBorder" /><i></i></label>
+              </div>
             </div>
 
-            <div style="display: flex; gap: 0.35rem; align-items: center;">
-              <button class="segmented-btn active" data-zoom="fit">Fit</button>
-              <button class="segmented-btn" data-zoom="50">50%</button>
-              <button class="segmented-btn" data-zoom="100">100%</button>
+            <!-- Barcode / QR -->
+            <div class="source-pane" id="src-barcode">
+              <div class="seg seg-full" id="codeTypeSeg" role="radiogroup" aria-label="Code type">
+                <button type="button" class="seg-btn active" data-code-type="qr">QR code</button>
+                <button type="button" class="seg-btn" data-code-type="code128">Barcode (Code 128)</button>
+              </div>
+              <div class="field">
+                <label class="field-label" for="barcodeValue">Content</label>
+                <input type="text" id="barcodeValue" value="https://github.com/WowkDigital/fichero-printer-WD" placeholder="Link, text or number…" autocomplete="off" />
+              </div>
+              <div class="field" data-code-only="qr">
+                <div class="field-row"><label class="field-label" for="qrSize">QR size</label><output class="val" id="valQrSize">60 mm</output></div>
+                <input type="range" id="qrSize" min="15" max="180" step="5" value="60" />
+              </div>
+              <div class="field" data-code-only="code128" hidden>
+                <div class="field-row"><label class="field-label" for="barModule">Bar width</label><output class="val" id="valBarModule">4 dots</output></div>
+                <input type="range" id="barModule" min="2" max="10" step="1" value="4" />
+              </div>
+              <div class="field" data-code-only="code128" hidden>
+                <div class="field-row"><label class="field-label" for="barHeight">Bar height</label><output class="val" id="valBarHeight">18 mm</output></div>
+                <input type="range" id="barHeight" min="8" max="60" step="1" value="18" />
+              </div>
+              <div class="toggle-list" data-code-only="qr">
+                <label class="toggle"><span>Show text under QR code</span><input type="checkbox" id="qrCaption" /><i></i></label>
+              </div>
+              <p class="hint" id="codeHint" hidden></p>
             </div>
-          </div>
 
-          <!-- Zoomable Paper Sheet -->
-          <div class="preview-viewport zoom-fit" id="previewViewport">
-            <div class="paper-sheet">
-              <canvas id="previewCanvas"></canvas>
+            <!-- Draw -->
+            <div class="source-pane" id="src-draw">
+              <p class="hint"><svg class="ic"><use href="#i-pen" /></svg>Draw on the paper with your finger, stylus or mouse.</p>
+              <div class="field">
+                <div class="field-row"><label class="field-label" for="drawLineWidth">Brush size</label><output class="val" id="valDrawLineWidth">6 px</output></div>
+                <input type="range" id="drawLineWidth" min="2" max="40" value="6" />
+              </div>
+              <div class="field">
+                <span class="field-label">Canvas height</span>
+                <div class="seg seg-full" id="drawHeightSeg" role="radiogroup" aria-label="Canvas height">
+                  <button type="button" class="seg-btn" data-draw-h="50">50 mm</button>
+                  <button type="button" class="seg-btn active" data-draw-h="100">100 mm</button>
+                  <button type="button" class="seg-btn" data-draw-h="200">200 mm</button>
+                </div>
+              </div>
+              <div class="btn-row">
+                <button type="button" class="btn btn-secondary" id="btnUndoDrawing"><svg class="ic"><use href="#i-undo" /></svg>Undo</button>
+                <button type="button" class="btn btn-secondary btn-danger-text" id="btnClearDrawing"><svg class="ic"><use href="#i-trash" /></svg>Clear</button>
+              </div>
             </div>
-          </div>
+
+            <!-- Test patterns -->
+            <div class="source-pane" id="src-test">
+              <div class="option-list" role="radiogroup" aria-label="Test pattern">
+                <button type="button" class="option" data-test="band-1cm">
+                  <span class="option-icon"><svg class="ic"><use href="#i-square" /></svg></span>
+                  <span class="option-text"><strong>1.0 cm black band</strong><span>Check density &amp; feed accuracy</span></span>
+                </button>
+                <button type="button" class="option" data-test="ruler">
+                  <span class="option-icon"><svg class="ic"><use href="#i-ruler" /></svg></span>
+                  <span class="option-text"><strong>Millimeter ruler</strong><span>Verify 1:1 scale across the head</span></span>
+                </button>
+                <button type="button" class="option" data-test="gradient">
+                  <span class="option-icon"><svg class="ic"><use href="#i-gradient" /></svg></span>
+                  <span class="option-text"><strong>Tone gradient</strong><span>Compare dithering algorithms</span></span>
+                </button>
+                <button type="button" class="option" data-test="alignment-grid">
+                  <span class="option-icon"><svg class="ic"><use href="#i-grid" /></svg></span>
+                  <span class="option-text"><strong>Alignment grid</strong><span>Check margins &amp; tray alignment</span></span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ========== PANEL: ADJUST ========== -->
+          <section class="panel" id="panel-adjust" role="tabpanel">
+            <div class="panel-head">
+              <h2>Image &amp; dithering</h2>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnResetAdjust"><svg class="ic"><use href="#i-reset" /></svg>Reset</button>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Quick style</span>
+              <div class="chip-row" id="styleChips">
+                <button type="button" class="chip" data-style="atkinson">Photo</button>
+                <button type="button" class="chip" data-style="otsu">Document</button>
+                <button type="button" class="chip" data-style="sobel">Sketch</button>
+                <button type="button" class="chip" data-style="halftone">Newsprint</button>
+                <button type="button" class="chip" data-style="bayer-4">Retro</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="selectAlgorithm">Dithering algorithm</label>
+              <select id="selectAlgorithm">
+                <optgroup label="Photos &amp; artwork">
+                  <option value="atkinson">Atkinson</option>
+                  <option value="floyd-steinberg">Floyd–Steinberg</option>
+                  <option value="stucki">Stucki</option>
+                  <option value="burkes">Burkes</option>
+                  <option value="sierra-3">Sierra 3-row</option>
+                </optgroup>
+                <optgroup label="Patterns &amp; screens">
+                  <option value="bayer-8">Bayer 8×8</option>
+                  <option value="bayer-4">Bayer 4×4</option>
+                  <option value="halftone">Halftone screen</option>
+                </optgroup>
+                <optgroup label="Documents &amp; line art">
+                  <option value="otsu">Otsu (auto threshold)</option>
+                  <option value="sobel">Sobel edges (sketch)</option>
+                  <option value="threshold">Manual threshold</option>
+                </optgroup>
+              </select>
+              <p class="field-help" id="algoHint"></p>
+            </div>
+
+            <div class="field">
+              <div class="field-row"><label class="field-label" for="rangeBrightness">Brightness</label><output class="val" id="valBrightness">0</output></div>
+              <input type="range" id="rangeBrightness" min="-100" max="100" value="0" data-default="0" />
+            </div>
+            <div class="field">
+              <div class="field-row"><label class="field-label" for="rangeContrast">Contrast</label><output class="val" id="valContrast">0</output></div>
+              <input type="range" id="rangeContrast" min="-100" max="100" value="0" data-default="0" />
+            </div>
+            <div class="field">
+              <div class="field-row"><label class="field-label" for="rangeGamma">Gamma</label><output class="val" id="valGamma">1.0</output></div>
+              <input type="range" id="rangeGamma" min="0.3" max="2.5" step="0.1" value="1.0" data-default="1" />
+            </div>
+            <div class="field" id="groupThreshold" hidden>
+              <div class="field-row"><label class="field-label" for="rangeThreshold">Black threshold</label><output class="val" id="valThreshold">128</output></div>
+              <input type="range" id="rangeThreshold" min="1" max="254" value="128" data-default="128" />
+            </div>
+            <div class="field" id="groupHalftone" hidden>
+              <div class="field-row"><label class="field-label" for="rangeHalftone">Halftone dot size</label><output class="val" id="valHalftone">6 px</output></div>
+              <input type="range" id="rangeHalftone" min="3" max="16" value="6" data-default="6" />
+            </div>
+            <p class="field-help hide-touch">Double-click a slider to reset it.</p>
+
+            <div class="toggle-list">
+              <label class="toggle"><span>Invert colors</span><input type="checkbox" id="switchInvert" /><i></i></label>
+              <label class="toggle"><span>Sharpen edges</span><input type="checkbox" id="switchSharpen" /><i></i></label>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-block" id="btnRotate"><svg class="ic"><use href="#i-rotate" /></svg>Rotate 90°</button>
+          </section>
+
+          <!-- ========== PANEL: PAPER ========== -->
+          <section class="panel" id="panel-paper" role="tabpanel">
+            <div class="panel-head"><h2>Paper</h2></div>
+
+            <div class="field">
+              <span class="field-label">Paper width</span>
+              <div class="option-list compact" id="paperPresetList" role="radiogroup" aria-label="Paper width"></div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Length</span>
+              <div class="seg seg-full" id="lengthModeSeg" role="radiogroup" aria-label="Paper length mode">
+                <button type="button" class="seg-btn active" data-mode="continuous">Fit to content</button>
+                <button type="button" class="seg-btn" data-mode="fixed">Fixed page <small id="fixedPageLabel">297 mm</small></button>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Position on printhead</span>
+              <div class="seg seg-full" id="alignSeg" role="radiogroup" aria-label="Alignment">
+                <button type="button" class="seg-btn" data-align="left"><svg class="ic"><use href="#i-align-left" /></svg>Left</button>
+                <button type="button" class="seg-btn active" data-align="center"><svg class="ic"><use href="#i-align-center" /></svg>Center</button>
+                <button type="button" class="seg-btn" data-align="right"><svg class="ic"><use href="#i-align-right" /></svg>Right</button>
+              </div>
+              <p class="field-help">Used when the paper is narrower than the printhead.</p>
+            </div>
+
+            <div class="field">
+              <div class="field-row"><label class="field-label" for="rangeFeedAfter">Feed after print</label><output class="val" id="valFeedAfter">20 mm</output></div>
+              <input type="range" id="rangeFeedAfter" min="0" max="60" value="20" data-default="20" />
+              <p class="field-help">Extra paper so the print clears the tear bar.</p>
+            </div>
+          </section>
+
+          <!-- ========== PANEL: PRINTER ========== -->
+          <section class="panel" id="panel-printer" role="tabpanel">
+            <div class="device-card" id="deviceCard" data-state="disconnected">
+              <div class="device-icon"><svg class="ic"><use href="#i-printer" /></svg><i class="device-dot"></i></div>
+              <div class="device-text">
+                <strong id="deviceName">No printer connected</strong>
+                <span id="deviceSub">Turn the printer on and tap Connect</span>
+              </div>
+              <button type="button" class="btn btn-primary" id="btnDeviceConnect"><svg class="ic"><use href="#i-bluetooth" /></svg><span>Connect</span></button>
+            </div>
+
+            <div class="status-chips" id="statusChips" hidden>
+              <span class="status-chip" id="chipBattery"><svg class="ic"><use href="#i-battery" /></svg><span id="chipBatteryVal">--%</span></span>
+              <span class="status-chip warn" id="chipCover" hidden><svg class="ic"><use href="#i-alert" /></svg>Cover open</span>
+              <span class="status-chip warn" id="chipPaper" hidden><svg class="ic"><use href="#i-alert" /></svg>No paper</span>
+              <span class="status-chip warn" id="chipHeat" hidden><svg class="ic"><use href="#i-alert" /></svg>Overheated</span>
+              <span class="status-chip ok" id="chipCharging" hidden><svg class="ic"><use href="#i-zap" /></svg>Charging</span>
+              <button type="button" class="icon-btn sm" id="btnDiagnosticStatus" aria-label="Refresh status" title="Refresh status"><svg class="ic"><use href="#i-refresh" /></svg></button>
+            </div>
+
+            <div class="notice warn" id="btUnsupported" hidden>
+              <svg class="ic"><use href="#i-alert" /></svg>
+              <div><strong>Web Bluetooth not available</strong><span>Use Chrome, Edge, Opera or Samsung Internet on Android, Windows, macOS, Linux or ChromeOS. iOS Safari is not supported.</span></div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Print darkness</span>
+              <div class="seg seg-full" id="densitySeg" role="radiogroup" aria-label="Print darkness">
+                <button type="button" class="seg-btn" data-density="0">Light</button>
+                <button type="button" class="seg-btn" data-density="1">Medium</button>
+                <button type="button" class="seg-btn active" data-density="2">Dark</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Feed paper</span>
+              <div class="feed-grid">
+                <button type="button" class="btn btn-secondary" data-feed="10"><svg class="ic"><use href="#i-feed" /></svg>1 cm</button>
+                <button type="button" class="btn btn-secondary" data-feed="20"><svg class="ic"><use href="#i-feed" /></svg>2 cm</button>
+                <button type="button" class="btn btn-secondary" data-feed="50"><svg class="ic"><use href="#i-feed" /></svg>5 cm</button>
+                <button type="button" class="btn btn-secondary" data-feed="100"><svg class="ic"><use href="#i-feed" /></svg>10 cm</button>
+              </div>
+            </div>
+
+            <details class="disclosure">
+              <summary><span>Advanced transmission</span><svg class="ic"><use href="#i-chevron-down" /></svg></summary>
+              <div class="disclosure-body">
+                <div class="field">
+                  <label class="field-label" for="selectChunkSize">BLE packet size</label>
+                  <select id="selectChunkSize">
+                    <option value="64">64 bytes – max compatibility</option>
+                    <option value="128">128 bytes</option>
+                    <option value="200">200 bytes – default</option>
+                    <option value="244">244 bytes – fastest</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <div class="field-row"><label class="field-label" for="rangeChunkDelay">Delay between packets</label><output class="val" id="valChunkDelay">20 ms</output></div>
+                  <input type="range" id="rangeChunkDelay" min="5" max="80" step="5" value="20" data-default="20" />
+                  <p class="field-help">Increase if your phone drops packets or disconnects mid-print.</p>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" id="btnDisconnect" hidden>Disconnect printer</button>
+              </div>
+            </details>
+          </section>
         </div>
-      </section>
 
-      <!-- Right Column: Settings & Direct Printing -->
-      <aside class="sidebar-pane">
-        <!-- Main Print Card -->
-        <div class="control-card" style="border-color: rgba(34, 197, 94, 0.4); background: linear-gradient(180deg, #18272f, #182235);">
-          <div class="control-card-title">
-            <span style="display: flex; align-items: center; gap: 0.4rem;">
-              <span style="font-size: 1.1rem;">🖨️</span> Print to Fichero 6181
-            </span>
+        <!-- Print bar -->
+        <div class="printbar">
+          <div class="stepper" role="group" aria-label="Copies">
+            <button type="button" class="stepper-btn" id="btnCopiesDec" aria-label="Fewer copies"><svg class="ic"><use href="#i-minus" /></svg></button>
+            <input type="number" id="copiesInput" value="1" min="1" max="99" inputmode="numeric" aria-label="Number of copies" />
+            <button type="button" class="stepper-btn" id="btnCopiesInc" aria-label="More copies"><svg class="ic"><use href="#i-plus" /></svg></button>
           </div>
-          <button id="btnPrint" class="btn btn-primary btn-lg btn-full">
-            <span>PRINT NOW</span>
+          <button type="button" id="btnPrint" class="btn btn-primary btn-print">
+            <svg class="ic"><use href="#i-printer" /></svg>
+            <span class="btn-print-text"><span>Print</span><small id="printPayloadSize">—</small></span>
           </button>
-          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-            <span>Copies: <input type="number" id="copiesInput" value="1" min="1" max="99" style="width: 50px; padding: 0.1rem 0.3rem;" /></span>
-            <span id="printPayloadSize">Size: -- KB</span>
-          </div>
-        </div>
-
-        <!-- Card: Dithering & Effects -->
-        <div class="control-card">
-          <div class="control-card-title">
-            <span>🎨 Dithering & Effects</span>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Raster Algorithm:</label>
-            <select id="selectAlgorithm">
-              <optgroup label="Artistic & Photos">
-                <option value="atkinson" selected>Atkinson (Crisp dots, MacPaint)</option>
-                <option value="floyd-steinberg">Floyd-Steinberg (Classic error diffusion)</option>
-                <option value="stucki">Stucki (High detail 48-div)</option>
-                <option value="burkes">Burkes (Smooth transitions)</option>
-                <option value="sierra-3">Sierra 3-row</option>
-              </optgroup>
-              <optgroup label="Geometric & Newsprint">
-                <option value="bayer-8">Bayer 8x8 (Ordered grid)</option>
-                <option value="bayer-4">Bayer 4x4 (Retro style)</option>
-                <option value="halftone">Halftone Screen (Newsprint dots)</option>
-              </optgroup>
-              <optgroup label="Documents & Text">
-                <option value="otsu">Otsu (Auto document threshold)</option>
-                <option value="sobel">Sobel Edge (Pencil outline sketch)</option>
-                <option value="threshold">Simple Threshold (Slider)</option>
-              </optgroup>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Brightness: <span class="val" id="valBrightness">0</span></label>
-            <input type="range" id="rangeBrightness" min="-100" max="100" value="0" />
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Contrast: <span class="val" id="valContrast">0</span></label>
-            <input type="range" id="rangeContrast" min="-100" max="100" value="0" />
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Gamma: <span class="val" id="valGamma">1.0</span></label>
-            <input type="range" id="rangeGamma" min="0.3" max="2.5" step="0.1" value="1.0" />
-          </div>
-
-          <div class="control-group" id="groupThreshold" style="display: none;">
-            <label class="control-label">Black Threshold: <span class="val" id="valThreshold">128</span></label>
-            <input type="range" id="rangeThreshold" min="1" max="254" value="128" />
-          </div>
-
-          <div class="control-group" id="groupHalftone" style="display: none;">
-            <label class="control-label">Halftone Dot Size: <span class="val" id="valHalftone">6</span>px</label>
-            <input type="range" id="rangeHalftone" min="3" max="16" value="6" />
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 0.6rem; padding-top: 0.3rem; border-top: 1px solid var(--border);">
-            <label class="switch-label">
-              <span>Invert colors (Negative)</span>
-              <input type="checkbox" id="switchInvert" class="switch-input" />
-            </label>
-            <label class="switch-label">
-              <span>Sharpen edges (Sharpen)</span>
-              <input type="checkbox" id="switchSharpen" class="switch-input" />
-            </label>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 0.8rem;">Rotate image:</span>
-              <button id="btnRotate" class="btn btn-secondary" style="padding: 0.25rem 0.6rem;">🔄 +90&deg;</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card: Working Area & Media Dimensions -->
-        <div class="control-card">
-          <div class="control-card-title">
-            <span>📐 Working Area & Paper</span>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Paper Width Preset:</label>
-            <select id="selectPaperPreset">
-              <option value="A4_STD" selected>A4 Standard (204 mm / 1632 px)</option>
-              <option value="A4_FULL">A4 Full Printhead (210 mm / 1680 px)</option>
-              <option value="LETTER">US Letter (216 mm / 1728 px)</option>
-              <option value="A5">A5 Roll (148 mm / 1184 px)</option>
-              <option value="ROLL_105">105 mm Roll (Labels / 840 px)</option>
-              <option value="ROLL_80">80 mm Roll (Receipt / 640 px)</option>
-              <option value="ROLL_58">58 mm Roll (Narrow / 464 px)</option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Paper Length Mode:</label>
-            <div class="segmented-bar">
-              <button class="segmented-btn active" data-mode="continuous">Continuous Roll</button>
-              <button class="segmented-btn" data-mode="fixed">Fixed A4 Page (297 mm)</button>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Tray Feed Alignment:</label>
-            <div class="segmented-bar">
-              <button class="segmented-btn" data-align="left">Left</button>
-              <button class="segmented-btn active" data-align="center">Center</button>
-              <button class="segmented-btn" data-align="right">Right</button>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Cutter Feed Margin (mm): <span class="val" id="valFeedAfter">20</span></label>
-            <input type="range" id="rangeFeedAfter" min="0" max="60" value="20" />
-          </div>
-        </div>
-
-        <!-- Card: BLE Pacing & Engine Speed -->
-        <div class="control-card">
-          <div class="control-card-title">
-            <span>⚡ Transmission Speed & Heat</span>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Printhead Heating Density:</label>
-            <div class="segmented-bar">
-              <button class="segmented-btn" data-density="0">0 (Light)</button>
-              <button class="segmented-btn" data-density="1">1 (Medium)</button>
-              <button class="segmented-btn active" data-density="2">2 (Dark)</button>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">BLE Packet Chunk Size: <span class="val" id="valChunkSize">200 B</span></label>
-            <select id="selectChunkSize">
-              <option value="64">64 Bytes (Max compatibility)</option>
-              <option value="128">128 Bytes</option>
-              <option value="200" selected>200 Bytes (Default BLE MTU)</option>
-              <option value="244">244 Bytes (High speed)</option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label">Inter-packet Pacing Delay: <span class="val" id="valChunkDelay">20 ms</span></label>
-            <input type="range" id="rangeChunkDelay" min="5" max="80" step="5" value="20" />
-            <span style="font-size: 0.7rem; color: var(--text-muted);">Increase if your phone drops packets or disconnects.</span>
-          </div>
         </div>
       </aside>
-    </main>
+    </div>
 
-    <!-- Modal: Print Progress -->
-    <div id="printModal" class="modal-backdrop">
-      <div class="modal-dialog">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 1.1rem; font-weight: 700;">Sending to Printer...</h3>
-          <span id="printProgressPercent" style="font-weight: 700; color: var(--accent);">0%</span>
+    <!-- ================= PRINT PROGRESS DIALOG ================= -->
+    <div class="modal" id="printModal" role="dialog" aria-modal="true" aria-labelledby="printModalTitle" hidden>
+      <div class="modal-card" data-state="sending">
+        <div class="print-anim" aria-hidden="true">
+          <svg class="ic print-anim-icon"><use href="#i-printer" /></svg>
+          <svg class="ic print-anim-ok"><use href="#i-check" /></svg>
+          <svg class="ic print-anim-err"><use href="#i-x" /></svg>
         </div>
-        <div class="progress-bar-container">
-          <div id="printProgressBar" class="progress-bar-fill"></div>
-        </div>
-        <p id="printStatusText" style="font-size: 0.85rem; color: var(--text-muted);">Preparing raster data...</p>
-        <div style="display: flex; justify-content: flex-end;">
-          <button id="btnCancelPrint" class="btn btn-danger">Cancel Print</button>
+        <h3 id="printModalTitle">Sending to printer…</h3>
+        <p id="printStatusText" class="modal-sub">Preparing raster data…</p>
+        <div class="progress"><div class="progress-fill" id="printProgressBar"></div></div>
+        <div class="progress-meta"><span id="printProgressPercent">0%</span></div>
+        <div class="modal-actions">
+          <button type="button" id="btnCancelPrint" class="btn btn-secondary btn-block">Cancel</button>
         </div>
       </div>
     </div>
 
-    <!-- Modal: Manual Feed & Diagnostics -->
-    <div id="manualModal" class="modal-backdrop">
-      <div class="modal-dialog">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 1.1rem; font-weight: 700;">Manual Paper & Diagnostics</h3>
-          <button class="btn btn-secondary" onclick="document.getElementById('manualModal').classList.remove('open')">&times;</button>
-        </div>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">
-          Feed paper precisely forward without printing or run diagnostic checks:
-        </p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-          <button class="btn btn-secondary" data-feed="10">Feed 1.0 cm</button>
-          <button class="btn btn-secondary" data-feed="20">Feed 2.0 cm</button>
-          <button class="btn btn-secondary" data-feed="50">Feed 5.0 cm</button>
-          <button class="btn btn-secondary" data-feed="100">Feed 10.0 cm</button>
-        </div>
-        <div style="border-top: 1px solid var(--border); padding-top: 1rem; display: flex; justify-content: space-between;">
-          <button id="btnDiagnosticStatus" class="btn btn-secondary">Refresh Status</button>
-          <button class="btn btn-primary" onclick="document.getElementById('manualModal').classList.remove('open')">Close</button>
-        </div>
-      </div>
-    </div>
+    <!-- Toasts -->
+    <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 
-    <!-- Hidden source canvas used for staging images -->
-    <canvas id="sourceCanvas" style="display: none;"></canvas>
+    <!-- Hidden file inputs & staging canvas -->
+    <input type="file" id="imageFileInput" accept="image/*" hidden />
+    <input type="file" id="pdfFileInput" accept="application/pdf" hidden />
+    <canvas id="sourceCanvas" hidden></canvas>
 
-    <!-- App Main Script Entry -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(console.warn);
+        });
+      }
+    </script>
     <script type="module" src="js/app.js"></script>
   </body>
 </html>
