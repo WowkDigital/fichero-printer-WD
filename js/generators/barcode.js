@@ -78,44 +78,76 @@ export function renderCode128(canvas, text, barWidth = 4, barHeight = 120) {
 }
 
 /**
- * QR Code Generator via online CDN or dynamic fallback
+ * Robust QR Code Generator
+ * Supports QRCode.toCanvas, new QRCode(...) instance, or image fallback.
  */
 export async function renderQrCode(canvas, text, size = 500) {
-  // If QRCode library is available globally, use it
-  if (typeof window.QRCode !== 'undefined') {
-    canvas.width = size;
-    canvas.height = size;
-    await window.QRCode.toCanvas(canvas, text, {
-      width: size,
-      margin: 2,
-      errorCorrectionLevel: 'M',
-      color: { dark: '#000000', light: '#ffffff' }
-    });
-    return;
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+
+  // Method 1: soldair/qrcode library: window.QRCode.toCanvas
+  if (typeof window.QRCode !== 'undefined' && typeof window.QRCode.toCanvas === 'function') {
+    try {
+      await window.QRCode.toCanvas(canvas, text, {
+        width: size,
+        margin: 2,
+        errorCorrectionLevel: 'M',
+        color: { dark: '#000000', light: '#ffffff' },
+      });
+      return;
+    } catch (e) {
+      console.warn('QRCode.toCanvas failed, falling back:', e);
+    }
   }
 
-  // Fallback to QR API image rendered on canvas
+  // Method 2: qrcodejs constructor: new window.QRCode(tempElement)
+  if (typeof window.QRCode === 'function') {
+    try {
+      const tempDiv = document.createElement('div');
+      new window.QRCode(tempDiv, {
+        text: text,
+        width: size,
+        height: size,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: 1, // M
+      });
+
+      // wait for image or canvas to render in tempDiv
+      await new Promise((r) => setTimeout(r, 80));
+      const qrCanvas = tempDiv.querySelector('canvas');
+      const qrImg = tempDiv.querySelector('img');
+
+      if (qrCanvas) {
+        ctx.drawImage(qrCanvas, 0, 0, size, size);
+        return;
+      } else if (qrImg && qrImg.src) {
+        const loadedImg = new Image();
+        loadedImg.onload = () => {
+          ctx.drawImage(loadedImg, 0, 0, size, size);
+        };
+        loadedImg.src = qrImg.src;
+        return;
+      }
+    } catch (e) {
+      console.warn('new QRCode constructor failed, falling back:', e);
+    }
+  }
+
+  // Method 3: Fallback using standalone QR API
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, size, size);
       ctx.drawImage(img, 0, 0, size, size);
       resolve();
     };
     img.onerror = () => {
-      // Basic text fallback
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, size, size);
       ctx.fillStyle = '#000000';
-      ctx.font = '20px monospace';
+      ctx.font = 'bold 20px monospace';
       ctx.textAlign = 'center';
       ctx.fillText('Kod QR dla:', size / 2, size / 2 - 20);
       ctx.fillText(text.slice(0, 25), size / 2, size / 2 + 20);
